@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import { getPatientById, deletePatient } from '../firebase/patients';
+import { useLoading } from '../App';
 import { Patient } from '../types';
 import Layout from '../components/Layout/Layout';
 import PersonalInfo from '../components/PatientDetail/PersonalInfo';
@@ -15,9 +16,9 @@ import Modal from '../components/UI/Modal';
 const PatientDetail: React.FC = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const navigate = useNavigate();
+  const { setLoading } = useLoading();
   
   const [patient, setPatient] = useState<Patient | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -48,7 +49,7 @@ const PatientDetail: React.FC = () => {
     };
     
     fetchPatient();
-  }, [patientId]);
+  }, [patientId, setLoading]);
   
   const handlePatientUpdate = (updatedPatient: Patient) => {
     setPatient(updatedPatient);
@@ -71,16 +72,6 @@ const PatientDetail: React.FC = () => {
       setDeleteLoading(false);
     }
   };
-  
-  if (loading) {
-    return (
-      <Layout>
-        <div className="flex justify-center items-center h-64">
-          <Spinner size="lg" />
-        </div>
-      </Layout>
-    );
-  }
   
   if (error || !patient) {
     return (
